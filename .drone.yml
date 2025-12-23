@@ -1,0 +1,30 @@
+kind: pipeline
+type: docker
+name: slack-test
+
+steps:
+  - name: test
+    image: alpine
+    commands:
+      - echo "Testing Drone Slack notification"
+
+  - name: slack-notify
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: https://hooks.slack.com/services/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
+      channel: "#general"
+      username: "Drone CI"
+      icon_emoji: ":rocket:"
+      message: |
+        🚀 *Drone CI Notification*
+        *Repo:* {{ repo.name }}
+        *Branch:* {{ build.branch }}
+        *Build:* #{{ build.number }}
+        *Status:* {{ build.status }}
+        *Commit:* {{ truncate commit.sha 7 }}
+        *Author:* {{ commit.author }}
+    when:
+      status:
+        - success
+        - failure
